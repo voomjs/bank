@@ -1,0 +1,15 @@
+version: '3.7'
+
+services:
+
+  mysql:
+    image: mysql:5.7
+    environment:
+      - MYSQL_USER=${BANK_USER}
+      - MYSQL_PASSWORD=${BANK_PASSWORD}
+      - MYSQL_DATABASE=${BANK_DATABASE}
+      - MYSQL_ROOT_PASSWORD=${BANK_PASSWORD}
+    ports:
+      - 3306:3306
+    expose:
+      - 3306

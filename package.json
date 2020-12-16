@@ -1,0 +1,43 @@
+{
+  "name": "@voom/bank",
+  "description": "Knex wrapper for Hapi",
+  "version": "0.0.0",
+  "license": "MIT",
+  "repository": "git://github.com/voomjs/bank",
+  "main": "lib/index.js",
+  "files": [
+    "lib/**/*"
+  ],
+  "keywords": [
+    "hapi",
+    "plugin",
+    "database",
+    "knex",
+    "sql"
+  ],
+  "dependencies": {
+    "joi": "17.x.x",
+    "knex": "0.21.x",
+    "lodash": "4.x.x"
+  },
+  "devDependencies": {
+    "@hapi/code": "8.x.x",
+    "@hapi/hapi": "20.x.x",
+    "@hapi/lab": "24.x.x",
+    "dotenv": "8.x.x",
+    "mysql": "2.x.x",
+    "sinon": "9.x.x",
+    "standard": "16.x.x"
+  },
+  "scripts": {
+    "test": "lab",
+    "test-html": "lab -r html -o coverage.html",
+    "lint": "standard --fix"
+  },
+  "standard": {
+    "env": [
+      "es6",
+      "node"
+    ]
+  }
+}
