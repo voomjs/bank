@@ -1,6 +1,5 @@
 require('dotenv/config')
 
-const Knex = require('knex')
 const Sinon = require('sinon')
 const Lab = require('@hapi/lab')
 const Code = require('@hapi/code')
@@ -9,7 +8,7 @@ const Hapi = require('@hapi/hapi')
 const Plugin = require('../lib')
 
 const { expect } = Code
-const { describe, it, afterEach } = exports.lab = Lab.script()
+const { describe, it } = exports.lab = Lab.script()
 
 const defaults = {
   client: 'mysql',
@@ -25,8 +24,6 @@ const defaults = {
   }
 }
 
-const knex = Knex(defaults)
-
 async function withServer (options) {
   const server = Hapi.Server()
 
@@ -39,10 +36,6 @@ async function withServer (options) {
 }
 
 describe('plugin', function () {
-  afterEach(async function () {
-    await knex.migrate.rollback({}, true)
-  })
-
   it('throws an error when options are missing', async function () {
     const server = Hapi.Server()
 
@@ -127,6 +120,8 @@ describe('plugin', function () {
       const versionPost = await server.bank().migrate.currentVersion()
 
       expect(versionPost).to.be.equal('none')
+
+      await server.bank().migrate.rollback({}, true)
     })
 
     it('does run migrations when auto.migrate is true', async function () {
@@ -141,6 +136,8 @@ describe('plugin', function () {
       const versionPost = await server.bank().migrate.currentVersion()
 
       expect(versionPost).to.be.equal('basic.js')
+
+      await server.bank().migrate.rollback({}, true)
     })
 
     it('does not run migrations when auto.migrate is false', async function () {
@@ -155,6 +152,8 @@ describe('plugin', function () {
       const versionPost = await server.bank().migrate.currentVersion()
 
       expect(versionPost).to.be.equal('none')
+
+      await server.bank().migrate.rollback({}, true)
     })
   })
 
