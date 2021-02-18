@@ -23,10 +23,10 @@
   "devDependencies": {
     "@hapi/code": "8.x.x",
     "@hapi/hapi": "20.x.x",
+    "@hapi/hoek": "9.x.x",
     "@hapi/lab": "24.x.x",
     "dotenv": "8.x.x",
     "mysql": "2.x.x",
-    "sinon": "9.x.x",
     "standard": "16.x.x"
   },
   "scripts": {

@@ -1,9 +1,9 @@
 require('dotenv/config')
 
-const Sinon = require('sinon')
 const Lab = require('@hapi/lab')
 const Code = require('@hapi/code')
 const Hapi = require('@hapi/hapi')
+const Hoek = require('@hapi/hoek')
 
 const Plugin = require('../lib')
 
@@ -24,12 +24,12 @@ const defaults = {
   }
 }
 
-async function withServer (options) {
+async function withServer (options = {}) {
   const server = Hapi.Server()
 
   await server.register({
     plugin: Plugin,
-    options: Object.assign({}, defaults, options)
+    options: Hoek.applyToDefaults(defaults, options)
   })
 
   return server
@@ -65,45 +65,39 @@ describe('plugin', function () {
 
   describe('connection', function () {
     it('does check connection by default', async function () {
-      const server = await withServer()
-
-      Sinon.stub(server.bank(), 'raw').callsFake(function () {
-        throw new Error('Database connection failed')
+      const server = await withServer({
+        connection: {
+          user: 'spri'
+        }
       })
 
-      try {
-        await server.initialize()
-
-        Code.fail()
-      } catch (e) {
-        expect(e.message).to.be.equal('Database connection failed')
-      }
+      await expect(server.initialize()).to.reject()
     })
 
     it('does check connection when auto.connect is true', async function () {
-      const server = await withServer({ auto: { connect: true } })
-
-      Sinon.stub(server.bank(), 'raw').callsFake(function () {
-        throw new Error('Database connection failed')
+      const server = await withServer({
+        connection: {
+          user: 'spri'
+        },
+        auto: {
+          connect: true
+        }
       })
 
-      try {
-        await server.initialize()
-
-        Code.fail()
-      } catch (e) {
-        expect(e.message).to.be.equal('Database connection failed')
-      }
+      await expect(server.initialize()).to.reject()
     })
 
     it('does not check connection when auto.connect is false', async function () {
-      const server = await withServer({ auto: { connect: false } })
-
-      Sinon.stub(server.bank(), 'raw').callsFake(function () {
-        throw new Error('Database connection failed')
+      const server = await withServer({
+        connection: {
+          user: 'spri'
+        },
+        auto: {
+          connect: false
+        }
       })
 
-      await server.initialize()
+      await expect(server.initialize()).to.not.reject()
     })
   })
 
@@ -161,55 +155,49 @@ describe('plugin', function () {
     it('does destroy connection by default', async function () {
       const server = await withServer()
 
+      await server.initialize()
+
       server.ext('onPreStop', function () {
         expect(server.bank()).to.exist()
       })
 
-      const spy = Sinon.spy(server.bank(), 'destroy')
-
-      await server.initialize()
-
-      expect(spy.callCount).to.be.equal(0)
+      server.ext('onPostStop', async function () {
+        await expect(server.bank().raw('SELECT 1')).to.reject()
+      })
 
       await server.stop()
-
-      expect(spy.callCount).to.be.equal(1)
     })
 
     it('does destroy connection when auto.destroy is true', async function () {
       const server = await withServer({ auto: { destroy: true } })
 
+      await server.initialize()
+
       server.ext('onPreStop', function () {
         expect(server.bank()).to.exist()
       })
 
-      const spy = Sinon.spy(server.bank(), 'destroy')
-
-      await server.initialize()
-
-      expect(spy.callCount).to.be.equal(0)
+      server.ext('onPostStop', async function () {
+        await expect(server.bank().raw('SELECT 1')).to.reject()
+      })
 
       await server.stop()
-
-      expect(spy.callCount).to.be.equal(1)
     })
 
     it('does not destroy connection when auto.destroy is false', async function () {
       const server = await withServer({ auto: { destroy: false } })
 
+      await server.initialize()
+
       server.ext('onPreStop', function () {
         expect(server.bank()).to.exist()
       })
 
-      const spy = Sinon.spy(server.bank(), 'destroy')
-
-      await server.initialize()
-
-      expect(spy.callCount).to.be.equal(0)
+      server.ext('onPostStop', async function () {
+        await expect(server.bank().raw('SELECT 1')).to.not.reject()
+      })
 
       await server.stop()
-
-      expect(spy.callCount).to.be.equal(0)
     })
   })
 
