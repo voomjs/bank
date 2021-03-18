@@ -203,7 +203,6 @@ describe('plugin', function () {
 
   describe('case conversion', function () {
     const noop = x => x
-    const date = new Date()
 
     const keys = [
       {
@@ -232,8 +231,7 @@ describe('plugin', function () {
       TestTypes: {
         TestNull: null,
         TestNumber: 1234,
-        TestBoolean: true,
-        testDate: date
+        TestBoolean: true
       },
       test_nested: {
         test_nested_one: {
@@ -253,8 +251,7 @@ describe('plugin', function () {
       testTypes: {
         testNull: null,
         testNumber: 1234,
-        testBoolean: true,
-        testDate: date
+        testBoolean: true
       },
       testNested: {
         testNestedOne: {
@@ -274,8 +271,7 @@ describe('plugin', function () {
       test_types: {
         test_null: null,
         test_number: 1234,
-        test_boolean: true,
-        test_date: date
+        test_boolean: true
       },
       test_nested: {
         test_nested_one: {
@@ -296,10 +292,6 @@ describe('plugin', function () {
 
       const { client: { config } } = server.bank()
 
-      expect(config).to.be.an.object()
-      expect(config.wrapIdentifier).to.be.a.function()
-      expect(config.postProcessResponse).to.be.a.function()
-
       const post = config.postProcessResponse
 
       expect(post(anyCaseObject)).to.be.equal(camelCaseObject)
@@ -311,10 +303,6 @@ describe('plugin', function () {
 
       const { client: { config } } = server.bank()
 
-      expect(config).to.be.an.object()
-      expect(config.wrapIdentifier).to.be.a.function()
-      expect(config.postProcessResponse).to.be.a.function()
-
       const wrap = config.wrapIdentifier
 
       for (const key of keys) {
@@ -323,10 +311,25 @@ describe('plugin', function () {
       }
     })
 
-    it('does not change string case when case is none', async function () {
+    it('does not change case in software when case is none', async function () {
       const server = await withServer({
         case: {
-          software: 'none',
+          software: 'none'
+        }
+      })
+
+      const { client: { config } } = server.bank()
+
+      const post = config.postProcessResponse
+
+      expect(post(anyCaseObject)).to.be.equal(anyCaseObject)
+      expect(post(camelCaseObject)).to.be.equal(camelCaseObject)
+      expect(post(snakeCaseObject)).to.be.equal(snakeCaseObject)
+    })
+
+    it('does not change case in database when case is none', async function () {
+      const server = await withServer({
+        case: {
           database: 'none'
         }
       })
@@ -334,26 +337,25 @@ describe('plugin', function () {
       const { client: { config } } = server.bank()
 
       const wrap = config.wrapIdentifier
-      const post = config.postProcessResponse
-
-      expect(post(anyCaseObject)).to.be.equal(anyCaseObject)
 
       for (const key of keys) {
         expect(wrap(key.any, noop)).to.be.equal(key.any)
+        expect(wrap(key.camel, noop)).to.be.equal(key.camel)
+        expect(wrap(key.snake, noop)).to.be.equal(key.snake)
       }
     })
 
-    it('extends existing hooks and uses case.software', async function () {
+    it('extends existing hooks', async function () {
       const server = await withServer({
-        wrapIdentifier (value, origImpl) {
+        wrapIdentifier (value) {
           expect(value).to.be.equal('testKey')
 
-          return origImpl(value + 'Wrap')
+          return value
         },
-        postProcessResponse (result) {
-          expect(result).to.be.equal({ testKey: 'value' })
+        postProcessResponse (value) {
+          expect(value).to.be.equal({ testKey: 'value' })
 
-          return Object.assign(result, { otherKey: 'other' })
+          return value
         }
       })
 
@@ -362,8 +364,8 @@ describe('plugin', function () {
       const wrap = config.wrapIdentifier
       const post = config.postProcessResponse
 
-      expect(wrap('testKey', noop)).to.be.equal('test_key_wrap')
-      expect(post({ test_key: 'value' })).to.be.equal({ testKey: 'value', otherKey: 'other' })
+      expect(wrap('testKey', noop)).to.be.equal('test_key')
+      expect(post({ test_key: 'value' })).to.be.equal({ testKey: 'value' })
     })
   })
 })
