@@ -16,18 +16,18 @@
     "sql"
   ],
   "dependencies": {
-    "joi": "17.x.x",
-    "knex": "0.21.x",
-    "lodash": "4.x.x"
+    "joi": "^17.0.0",
+    "knex": "^0.95.0",
+    "lodash": "^4.0.0"
   },
   "devDependencies": {
-    "@hapi/code": "8.x.x",
-    "@hapi/hapi": "20.x.x",
-    "@hapi/hoek": "9.x.x",
-    "@hapi/lab": "24.x.x",
-    "dotenv": "8.x.x",
-    "mysql": "2.x.x",
-    "standard": "16.x.x"
+    "@hapi/code": "^8.0.0",
+    "@hapi/hapi": "^20.0.0",
+    "@hapi/hoek": "^9.0.0",
+    "@hapi/lab": "^24.0.0",
+    "dotenv": "^8.0.0",
+    "mysql": "^2.0.0",
+    "standard": "^16.0.0"
   },
   "scripts": {
     "test": "lab",
