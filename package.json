@@ -1,7 +1,7 @@
 {
   "name": "@voom/bank",
   "description": "Knex wrapper for Hapi",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "license": "MIT",
   "repository": "git://github.com/voomjs/bank",
   "main": "lib/index.js",
