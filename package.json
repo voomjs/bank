@@ -1,6 +1,6 @@
 {
   "name": "@voom/bank",
-  "description": "Knex wrapper for Hapi",
+  "description": "SQL client for Hapi",
   "version": "0.2.1",
   "license": "MIT",
   "repository": "git://github.com/voomjs/bank",

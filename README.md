@@ -1,6 +1,6 @@
 # @voom/bank
 
-#### [Knex](https://knexjs.org) wrapper for [Hapi](https://hapi.dev).
+#### SQL client for [Hapi](https://hapi.dev).
 
 This plugin exposes a bank instance within your server.
  
